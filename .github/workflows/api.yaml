@@ -33,7 +33,7 @@ jobs:
         run: echo "${{ github.event_name }} from ref [${{ github.ref }}]"
 
   build:
-    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simpleMavenBuild.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simpleMavenBuild.yml@main
     with:
       PRJ_PATH: paperworks-api
       PRJ_NAME: paperworks-api
