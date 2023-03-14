@@ -35,14 +35,14 @@ jobs:
     #    run: echo "${{ github.event_name }} from ref [${{ github.ref }}]"
 
   build:
-    uses: DevArch/reusable-workflows/.github/workflows/simpleMavenBuild.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simpleMavenBuild.yml@main
     with:
       PRJ_PATH: paperworks-catalog
       PRJ_NAME: paperworks-catalog
       PUBLISH_FLAG: true
 
   deployDev:
-    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@main
     needs: build
     if: github.ref == 'refs/heads/master' && github.event != 'schedule'
     #### variables used by the re-usable workflow here
@@ -54,7 +54,7 @@ jobs:
       PASS: ${{ secrets.CD_PASS }}
 
   deployTest:
-    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@main
     needs: build
     if:  github.event_name == 'schedule'
     #### variables used by the re-usable workflow here
@@ -65,29 +65,4 @@ jobs:
     secrets:
       PASS: ${{ secrets.CD_PASS }}
 
-  deployStag:
-    #### definition of the re-usable workflow here
-    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
-    needs: build
-    if: contains(github.ref_name, 'hotfix') || contains(github.ref_name, 'release')
-    #### variables used by the re-usable workflow here
-    # define with: for simple variables and secret: the secrets daaah
-    with:
-      ENV: STAG
-      TARGETS: "PB-S-TEST01 PB-S-TEST02"
-    secrets:
-      PASS: ${{ secrets.CD_PASS }}
-
-
-  deployProd:
-    #### definition of the re-usable workflow here
-    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
-    needs: [ deployStag ]
-
-    #### variables used by the re-usable workflow here
-    # define with: for simple variables and secret: the secrets daaah
-    with:
-      ENV: PROD
-      TARGETS: "PB-P-TEST01 PB-P-TEST02"
-    secrets:
-      PASS: ${{ secrets.CD_PASS }}
+  
