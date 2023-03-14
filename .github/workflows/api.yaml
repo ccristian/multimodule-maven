@@ -1,4 +1,4 @@
-name: api workflow
+name: Api Workflow
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
@@ -33,7 +33,7 @@ jobs:
         run: echo "${{ github.event_name }} from ref [${{ github.ref }}]"
 
   build:
-    uses: reusable-workflows-saas-github/.github/workflows/simpleMavenBuild.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simpleMavenBuild.yml@master
     with:
       PRJ_PATH: paperworks-api
       PRJ_NAME: paperworks-api
