@@ -1,0 +1,92 @@
+name: domain
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  push:
+    branches: [ "master", "releases/**" ]
+    paths:
+      - 'paperworks-domain/**'
+      - '!.github/workflows/*'
+
+  create:
+    branches:
+      - releases/*
+    paths:
+      - 'paperworks-domain/**'
+      - '!.github/workflows/*'
+
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '22 17 * * 1-5'
+    #- cron: "*/5 * * * *"
+
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Set the called workflow and pass the needed params
+jobs:
+
+  prebuild:
+    runs-on: [eks]
+    steps:
+      - name: Output event data
+        run: echo "${{ github.event_name }} from ref [${{ github.ref }}]"
+
+  build:
+    uses: DevArch/reusable-workflows/.github/workflows/simpleMavenBuild.yml@master
+    with:
+      PRJ_PATH: paperworks-domain
+      PRJ_NAME: paperworks-domain
+      PUBLISH_FLAG: true
+
+  deployDev:
+    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    needs: build
+    if: github.ref == 'refs/heads/master' && github.event != 'schedule'
+    #### variables used by the re-usable workflow here
+    # define with: for simple variables and secret: the secrets daaah
+    with:
+      ENV:  DEV
+      TARGETS: CS-D-DAPOC01
+    secrets:
+      PASS: ${{ secrets.CD_PASS }}
+
+  deployTest:
+    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    needs: build
+    if:  github.event_name == 'schedule'
+    #### variables used by the re-usable workflow here
+    # define with: for simple variables and secret: the secrets daaah
+    with:
+      ENV: TEST
+      TARGETS: "PB-T-TEST01 PB-T-TEST02"
+    secrets:
+      PASS: ${{ secrets.CD_PASS }}
+
+  deployStag:
+    #### definition of the re-usable workflow here
+    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    needs: build
+    if: contains(github.ref_name, 'hotfix') || contains(github.ref_name, 'release')
+    #### variables used by the re-usable workflow here
+    # define with: for simple variables and secret: the secrets daaah
+    with:
+      ENV: STAG
+      TARGETS: "PB-S-TEST01 PB-S-TEST02"
+    secrets:
+      PASS: ${{ secrets.CD_PASS }}
+
+
+  deployProd:
+    #### definition of the re-usable workflow here
+    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    needs: [ deployStag ]
+
+    #### variables used by the re-usable workflow here
+    # define with: for simple variables and secret: the secrets daaah
+    with:
+      ENV: PROD
+      TARGETS: "PB-P-TEST01 PB-P-TEST02"
+    secrets:
+      PASS: ${{ secrets.CD_PASS }}
