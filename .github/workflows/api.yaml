@@ -18,7 +18,6 @@ on:
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '22 17 * * 1-5'
-    - cron: "*/30 * * * *"
 
 
   # Allows you to run this workflow manually from the Actions tab
@@ -28,19 +27,19 @@ on:
 jobs:
 
   prebuild:
-    runs-on: [Linux, self-hosted ,aws]
+    runs-on: ubuntu-latest
     steps:
       - name: Output event data
         run: echo "${{ github.event_name }} from ref [${{ github.ref }}]"
 
   build:
-    uses: DevArch/reusable-workflows/.github/workflows/simpleMavenBuild.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simpleMavenBuild.yml@master
     with:
       PRJ_PATH: paperworks-api
       PRJ_NAME: paperworks-api
       PUBLISH_FLAG: true
   deployDev:
-    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@master
     needs: build
     if: github.ref == 'refs/heads/master' && github.event != 'schedule'
     #### variables used by the re-usable workflow here
@@ -52,7 +51,7 @@ jobs:
       PASS: ${{ secrets.CD_PASS }}
 
   deployTest:
-    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@master
     needs: build
     if:  github.event_name == 'schedule'
     #### variables used by the re-usable workflow here
@@ -65,7 +64,7 @@ jobs:
 
   deployStag:
     #### definition of the re-usable workflow here
-    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@master
     needs: build
     if: contains(github.ref_name, 'hotfix') || contains(github.ref_name, 'release')
     #### variables used by the re-usable workflow here
@@ -79,7 +78,7 @@ jobs:
 
   deployProd:
     #### definition of the re-usable workflow here
-    uses: DevArch/reusable-workflows/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@master
     needs: [ deployStag ]
 
     #### variables used by the re-usable workflow here
