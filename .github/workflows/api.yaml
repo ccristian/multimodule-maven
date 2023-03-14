@@ -39,7 +39,7 @@ jobs:
       PRJ_NAME: paperworks-api
       PUBLISH_FLAG: true
   deployDev:
-    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@main
     needs: build
     if: github.ref == 'refs/heads/master' && github.event != 'schedule'
     #### variables used by the re-usable workflow here
@@ -51,7 +51,7 @@ jobs:
       PASS: ${{ secrets.CD_PASS }}
 
   deployTest:
-    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@main
     needs: build
     if:  github.event_name == 'schedule'
     #### variables used by the re-usable workflow here
@@ -64,7 +64,7 @@ jobs:
 
   deployStag:
     #### definition of the re-usable workflow here
-    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@main
     needs: build
     if: contains(github.ref_name, 'hotfix') || contains(github.ref_name, 'release')
     #### variables used by the re-usable workflow here
@@ -78,7 +78,7 @@ jobs:
 
   deployProd:
     #### definition of the re-usable workflow here
-    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@master
+    uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@main
     needs: [ deployStag ]
 
     #### variables used by the re-usable workflow here
