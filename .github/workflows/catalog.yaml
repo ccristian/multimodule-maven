@@ -44,7 +44,7 @@ jobs:
   deployDev:
     uses: ccristian/reusable-workflows-saas-github/.github/workflows/simulateDeploy.yml@main
     needs: build
-    if: github.ref == 'refs/heads/master' && github.event != 'schedule'
+    if: github.ref == 'refs/heads/main' && github.event != 'schedule'
     #### variables used by the re-usable workflow here
     # define with: for simple variables and secret: the secrets daaah
     with:
